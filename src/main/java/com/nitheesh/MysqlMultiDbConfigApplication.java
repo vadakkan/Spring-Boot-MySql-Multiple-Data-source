@@ -1,19 +1,18 @@
 package com.nitheesh;
 
+import com.nitheesh.mvc.primary.domain.Address;
 import com.nitheesh.mvc.primary.domain.Person;
+import com.nitheesh.mvc.primary.repository.AddressRepository;
 import com.nitheesh.mvc.primary.repository.PersonRepository;
-import com.nitheesh.mvc.secondary.domain.Details;
 import com.nitheesh.mvc.secondary.repository.DetailsRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.nitheesh")
@@ -24,32 +23,23 @@ public class MysqlMultiDbConfigApplication {
     }
 
     @Bean
-    CommandLineRunner adminCourse(PersonRepository personRepository, DetailsRepository detailsRepository) {
+    CommandLineRunner adminCourse(PersonRepository personRepository, AddressRepository addressRepository) {
 
 
         return args -> {
+
             personRepository
                     .deleteAll();
+            addressRepository.deleteAll();
 
-            Stream.of(new Person("Nitheesh Chandran", "Ernakulam"),
-                    new Person("Lionel Messi", "Argentina"),
-                    new Person("Andreas Inniesta", "Argentina"),
-                    new Person("David Villa", "Argentina"))
-                    .forEach(course -> {
-                        personRepository.save(course);
 
-                    });
+            List<Address> addressList=new ArrayList<>();
+            addressList.add(addressRepository.save(new Address().defaultAddressOne()));
+            addressList.add(addressRepository.save(new Address().defaultAddressTwo()));
 
-            detailsRepository.deleteAll();
+            personRepository.save(new Person(addressList));
 
-            Stream.of(new Details("Software Engineer"),
-                    new Details("Footballer"),
-                    new Details("Footballer"),
-                    new Details("Footballer"))
-                    .forEach(course -> {
-                        detailsRepository.save(course);
 
-                    });
         };
 
     }
